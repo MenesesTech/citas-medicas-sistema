@@ -2,7 +2,8 @@ package com.femt.user.models;
 
 public enum Rol {
     ADMIN("admin"),
-    USER("user");
+    USER("user"),
+    DOCTOR("doctor");
 
     private String rol;
 
