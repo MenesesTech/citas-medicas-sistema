@@ -7,5 +7,5 @@ import com.femt.medical.models.MedicalStaff.DayOfWeek;
 import com.femt.medical.models.Specialty;
 
 public record UpdateMedicalStaffDTO(Long userId, String phone, Specialty specialty, LocalTime startTime,
-        LocalTime endTime, List<DayOfWeek> workingDays) {
+                LocalTime endTime, List<DayOfWeek> workingDays) {
 }
