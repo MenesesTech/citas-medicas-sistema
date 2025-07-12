@@ -26,7 +26,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/api/citas/sync/medico").permitAll()
+                        .requestMatchers("/api/citas/sync/**").permitAll() // Permitir sincronización
                         .requestMatchers("/api/citas/reservar").hasRole("PATIENT")
                         .requestMatchers("/api/citas/medico").hasRole("DOCTOR")
                         .requestMatchers("/api/citas/paciente").hasRole("PATIENT")

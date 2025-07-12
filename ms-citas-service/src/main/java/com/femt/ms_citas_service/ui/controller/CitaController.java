@@ -23,18 +23,22 @@ public class CitaController {
     @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<?> reservarCita(@RequestBody CitaRequest request,
             @RequestHeader("Authorization") String token) {
-        // Extraer UUID desde el token
-        String cleanedToken = token.replace("Bearer ", "");
-        UUID pacienteId = citaService.extraerPacienteIdDesdeToken(cleanedToken);
-        Cita cita = citaService.reservarCita(request, pacienteId);
-        return ResponseEntity.ok(cita);
+        try {
+            // Extraer UUID desde el token
+            String cleanedToken = token.replace("Bearer ", "");
+            UUID pacienteId = citaService.extraerUsuarioIdDesdeToken(cleanedToken);
+            Cita cita = citaService.reservarCita(request, pacienteId);
+            return ResponseEntity.ok(cita);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error al reservar cita: " + e.getMessage());
+        }
     }
 
     @GetMapping("/medico")
     @PreAuthorize("hasRole('DOCTOR')")
     public ResponseEntity<List<Cita>> obtenerCitasDelMedico(@RequestHeader("Authorization") String token) {
         String cleanedToken = token.replace("Bearer ", "");
-        UUID medicoId = citaService.extraerPacienteIdDesdeToken(cleanedToken);
+        UUID medicoId = citaService.extraerUsuarioIdDesdeToken(cleanedToken);
         List<Cita> citas = citaService.obtenerCitasDelMedico(medicoId);
         return ResponseEntity.ok(citas);
     }
@@ -43,7 +47,7 @@ public class CitaController {
     @PreAuthorize("hasRole('PATIENT')")
     public ResponseEntity<List<Cita>> obtenerCitasDelPaciente(@RequestHeader("Authorization") String token) {
         String cleanedToken = token.replace("Bearer ", "");
-        UUID pacienteId = citaService.extraerPacienteIdDesdeToken(cleanedToken);
+        UUID pacienteId = citaService.extraerUsuarioIdDesdeToken(cleanedToken);
         List<Cita> citas = citaService.obtenerCitasDelPaciente(pacienteId);
         return ResponseEntity.ok(citas);
     }

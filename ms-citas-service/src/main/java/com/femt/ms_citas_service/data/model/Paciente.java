@@ -23,4 +23,8 @@ public class Paciente {
     private String correo;
 
     private String telefono;
+
+    private String dni;
+    private String ciudad;
+    private String distrito;
 }

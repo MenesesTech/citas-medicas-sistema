@@ -34,21 +34,29 @@ public class CitaService {
 
     @Transactional
     public Cita reservarCita(CitaRequest request, UUID pacienteId) {
+        // Validar fecha y hora
         if (request.getFecha().isBefore(LocalDate.now()) ||
                 (request.getFecha().isEqual(LocalDate.now()) && request.getHora().isBefore(LocalTime.now()))) {
             throw new IllegalArgumentException("La cita debe ser en una fecha y hora futura");
         }
+
+        // Verificar disponibilidad del médico
         List<Cita> existingCitas = citaRepository.findByMedicoIdAndFechaAndHora(
                 request.getIdMedico(), request.getFecha(), request.getHora());
         if (!existingCitas.isEmpty()) {
             throw new IllegalStateException("El médico ya tiene una cita en ese horario");
         }
 
+        // Buscar paciente
         Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new PacienteNotFoundException("Paciente no encontrado"));
-        Medico medico = medicoRepository.findById(request.getIdMedico())
-                .orElseThrow(() -> new MedicoNotFoundException("Médico no encontrado"));
+                .orElseThrow(() -> new PacienteNotFoundException("Paciente no encontrado con ID: " + pacienteId));
 
+        // Buscar médico
+        Medico medico = medicoRepository.findById(request.getIdMedico())
+                .orElseThrow(
+                        () -> new MedicoNotFoundException("Médico no encontrado con ID: " + request.getIdMedico()));
+
+        // Crear cita
         Cita cita = new Cita();
         cita.setFecha(request.getFecha());
         cita.setHora(request.getHora());
@@ -66,7 +74,7 @@ public class CitaService {
         return citaRepository.findByPacienteId(pacienteId);
     }
 
-    public UUID extraerPacienteIdDesdeToken(String token) {
+    public UUID extraerUsuarioIdDesdeToken(String token) {
         return tokenService.extraerDatos(token).uuid();
     }
 }
