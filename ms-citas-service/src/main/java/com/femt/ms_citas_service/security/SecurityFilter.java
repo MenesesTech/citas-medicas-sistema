@@ -35,17 +35,22 @@ public class SecurityFilter extends OncePerRequestFilter {
         if (token != null) {
             try {
                 TokenService.DatosToken datos = tokenService.extraerDatos(token);
-                logger.info("Extracted role: {}", datos.role());
+                logger.info("Token validation successful - UUID: {}, Role: {}", datos.uuid(), datos.role());
+                String authority = "ROLE_" + datos.role().toUpperCase();
+                logger.info("Creating authority: {}", authority);
                 var auth = new UsernamePasswordAuthenticationToken(
                         datos.uuid(),
                         null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + datos.role().toUpperCase())));
+                        List.of(new SimpleGrantedAuthority(authority)));
                 SecurityContextHolder.getContext().setAuthentication(auth);
+                logger.info("Authentication set successfully");
             } catch (Exception e) {
-                logger.error("Error validating token: {}", e.getMessage());
+                logger.error("Error validating token: {}", e.getMessage(), e);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
+        } else {
+            logger.warn("No token found in request");
         }
 
         filterChain.doFilter(request, response);

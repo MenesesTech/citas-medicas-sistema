@@ -26,11 +26,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/api/citas/sync/medico").permitAll()
                         .requestMatchers("/api/citas/reservar").hasRole("PATIENT")
                         .requestMatchers("/api/citas/medico").hasRole("DOCTOR")
                         .requestMatchers("/api/citas/paciente").hasRole("PATIENT")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
