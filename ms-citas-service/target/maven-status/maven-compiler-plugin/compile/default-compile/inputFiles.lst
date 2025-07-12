@@ -1,3 +1,4 @@
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\config\SecurityConfig.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\dto\CitaRequest.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\model\Cita.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\model\Medico.java
@@ -5,7 +6,10 @@ C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\repository\CitaRepository.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\repository\MedicoRepository.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\repository\PacienteRepository.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\exception\MedicoNotFoundException.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\exception\PacienteNotFoundException.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\MsCitasServiceApplication.java
-C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\security\SecurityConfig.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\security\SecurityFilter.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\security\TokenService.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\ui\controller\CitaController.java
 C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\ui\service\CitaService.java

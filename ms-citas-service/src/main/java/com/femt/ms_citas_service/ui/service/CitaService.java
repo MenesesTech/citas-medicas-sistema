@@ -7,9 +7,18 @@ import com.femt.ms_citas_service.data.model.Paciente;
 import com.femt.ms_citas_service.data.repository.CitaRepository;
 import com.femt.ms_citas_service.data.repository.MedicoRepository;
 import com.femt.ms_citas_service.data.repository.PacienteRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import com.femt.ms_citas_service.exception.MedicoNotFoundException;
+import com.femt.ms_citas_service.exception.PacienteNotFoundException;
+import com.femt.ms_citas_service.security.TokenService;
 
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,14 +29,25 @@ public class CitaService {
     private final MedicoRepository medicoRepository;
     private final PacienteRepository pacienteRepository;
 
-    public Cita reservarCita(CitaRequest request, String pacienteUUID) {
-        UUID pacienteId = UUID.fromString(pacienteUUID);
+    @Autowired
+    private TokenService tokenService;
+
+    @Transactional
+    public Cita reservarCita(CitaRequest request, UUID pacienteId) {
+        if (request.getFecha().isBefore(LocalDate.now()) ||
+                (request.getFecha().isEqual(LocalDate.now()) && request.getHora().isBefore(LocalTime.now()))) {
+            throw new IllegalArgumentException("La cita debe ser en una fecha y hora futura");
+        }
+        List<Cita> existingCitas = citaRepository.findByMedicoIdAndFechaAndHora(
+                request.getIdMedico(), request.getFecha(), request.getHora());
+        if (!existingCitas.isEmpty()) {
+            throw new IllegalStateException("El médico ya tiene una cita en ese horario");
+        }
 
         Paciente paciente = pacienteRepository.findById(pacienteId)
-            .orElseThrow(() -> new RuntimeException("Paciente no encontrado"));
-
+                .orElseThrow(() -> new PacienteNotFoundException("Paciente no encontrado"));
         Medico medico = medicoRepository.findById(request.getIdMedico())
-            .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
+                .orElseThrow(() -> new MedicoNotFoundException("Médico no encontrado"));
 
         Cita cita = new Cita();
         cita.setFecha(request.getFecha());
@@ -38,13 +58,15 @@ public class CitaService {
         return citaRepository.save(cita);
     }
 
-    public List<Cita> obtenerCitasDelMedico(String medicoUUID) {
-        UUID id = UUID.fromString(medicoUUID);
-        return citaRepository.findByMedicoId(id);
+    public List<Cita> obtenerCitasDelMedico(UUID medicoId) {
+        return citaRepository.findByMedicoId(medicoId);
     }
 
-    public List<Cita> obtenerCitasDelPaciente(String pacienteUUID) {
-        UUID id = UUID.fromString(pacienteUUID);
-        return citaRepository.findByPacienteId(id);
+    public List<Cita> obtenerCitasDelPaciente(UUID pacienteId) {
+        return citaRepository.findByPacienteId(pacienteId);
+    }
+
+    public UUID extraerPacienteIdDesdeToken(String token) {
+        return tokenService.extraerDatos(token).uuid();
     }
 }

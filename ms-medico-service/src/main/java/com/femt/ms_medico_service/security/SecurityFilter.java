@@ -1,7 +1,9 @@
-package com.femt.ms_patient_service.security;
+package com.femt.ms_medico_service.security;
 
-import java.io.IOException;
-import java.util.List;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,12 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.femt.ms_patient_service.security.TokenService.DatosToken;
-
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -24,24 +22,21 @@ public class SecurityFilter extends OncePerRequestFilter {
     private TokenService tokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         String token = recoverToken(request);
 
         if (token != null) {
             try {
-                DatosToken datos = tokenService.extraerDatos(token);
+                TokenService.DatosToken datos = tokenService.extraerDatos(token);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        datos.uuid(), // El UUID del usuario como principal
+                var authentication = new UsernamePasswordAuthenticationToken(
+                        datos.uuid(),
                         null,
-                        List.of(new SimpleGrantedAuthority("ROLE_" + datos.role().toUpperCase())) // Rol dinámico
-                );
+                        List.of(new SimpleGrantedAuthority("ROLE_" + datos.role().toUpperCase())));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;

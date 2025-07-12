@@ -1,11 +1,10 @@
-com\femt\ms_citas_service\ui\controller\CitaController.class
 com\femt\ms_citas_service\data\model\Paciente.class
 com\femt\ms_citas_service\MsCitasServiceApplication.class
-com\femt\ms_citas_service\data\dto\CitaRequest.class
-com\femt\ms_citas_service\data\model\Medico.class
 com\femt\ms_citas_service\data\repository\PacienteRepository.class
-com\femt\ms_citas_service\security\SecurityConfig.class
 com\femt\ms_citas_service\ui\service\CitaService.class
 com\femt\ms_citas_service\data\model\Cita.class
-com\femt\ms_citas_service\data\repository\MedicoRepository.class
 com\femt\ms_citas_service\data\repository\CitaRepository.class
+com\femt\ms_citas_service\ui\controller\CitaController.class
+com\femt\ms_citas_service\data\dto\CitaRequest.class
+com\femt\ms_citas_service\data\model\Medico.class
+com\femt\ms_citas_service\data\repository\MedicoRepository.class
