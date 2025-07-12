@@ -1,0 +1,11 @@
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\dto\CitaRequest.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\model\Cita.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\model\Medico.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\model\Paciente.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\repository\CitaRepository.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\repository\MedicoRepository.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\data\repository\PacienteRepository.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\MsCitasServiceApplication.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\security\SecurityConfig.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\ui\controller\CitaController.java
+C:\DevProjects\citas-medicas-sistema\ms-citas-service\src\main\java\com\femt\ms_citas_service\ui\service\CitaService.java
