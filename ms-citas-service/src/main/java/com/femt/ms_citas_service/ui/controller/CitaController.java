@@ -1,54 +1,68 @@
 package com.femt.ms_citas_service.ui.controller;
 
-import com.femt.ms_citas_service.data.dto.CitaRequest;
-import com.femt.ms_citas_service.data.model.Cita;
-import com.femt.ms_citas_service.ui.service.CitaService;
-
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.femt.ms_citas_service.data.dto.CitaRegistroDTO;
+import com.femt.ms_citas_service.data.dto.CitaResponseDTO;
+import com.femt.ms_citas_service.ui.service.CitaService;
+
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/citas")
-@RequiredArgsConstructor
+@RequestMapping(value = "/api/citas", produces = { "application/json" })
 public class CitaController {
+    @Autowired
+    private CitaService citaService;
 
-    private final CitaService citaService;
-
-    @PostMapping("/reservar")
-    @PreAuthorize("hasRole('PATIENT')")
-    public ResponseEntity<?> reservarCita(@RequestBody CitaRequest request,
-            @RequestHeader("Authorization") String token) {
+    @PostMapping(value = "/registro", consumes = { "application/json" })
+    public ResponseEntity<CitaResponseDTO> registro(
+            @Valid @RequestBody CitaRegistroDTO registroCitaDTO) {
         try {
-            // Extraer UUID desde el token
-            String cleanedToken = token.replace("Bearer ", "");
-            UUID pacienteId = citaService.extraerUsuarioIdDesdeToken(cleanedToken);
-            Cita cita = citaService.reservarCita(request, pacienteId);
-            return ResponseEntity.ok(cita);
+            CitaResponseDTO response = citaService.guardar(registroCitaDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Error al reservar cita: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
-    @GetMapping("/medico")
-    @PreAuthorize("hasRole('DOCTOR')")
-    public ResponseEntity<List<Cita>> obtenerCitasDelMedico(@RequestHeader("Authorization") String token) {
-        String cleanedToken = token.replace("Bearer ", "");
-        UUID medicoId = citaService.extraerUsuarioIdDesdeToken(cleanedToken);
-        List<Cita> citas = citaService.obtenerCitasDelMedico(medicoId);
+    @GetMapping
+    public ResponseEntity<List<CitaResponseDTO>> listar() {
+        List<CitaResponseDTO> citas = citaService.listar();
         return ResponseEntity.ok(citas);
     }
 
-    @GetMapping("/paciente")
-    @PreAuthorize("hasRole('PATIENT')")
-    public ResponseEntity<List<Cita>> obtenerCitasDelPaciente(@RequestHeader("Authorization") String token) {
-        String cleanedToken = token.replace("Bearer ", "");
-        UUID pacienteId = citaService.extraerUsuarioIdDesdeToken(cleanedToken);
-        List<Cita> citas = citaService.obtenerCitasDelPaciente(pacienteId);
-        return ResponseEntity.ok(citas);
+    @GetMapping("/{id}")
+    public ResponseEntity<CitaResponseDTO> obtener(@PathVariable Long id) {
+        try {
+            CitaResponseDTO cita = citaService.obtener(id);
+            return ResponseEntity.ok(cita);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @PutMapping(value = "/{id}", consumes = { "application/json" })
+    public ResponseEntity<CitaResponseDTO> actualizar(
+            @PathVariable Long id, @Valid @RequestBody CitaRegistroDTO citaDTO) {
+        try {
+            CitaResponseDTO response = citaService.actualizar(id, citaDTO);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        try {
+            citaService.eliminar(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

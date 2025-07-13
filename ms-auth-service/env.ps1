@@ -18,7 +18,7 @@ $env:ADMIN_API_KEY = "96rFZ8ff2a4oYzMna3uiL2"
 # ===================================
 #       CONFIGURACION DE SERVIDOR
 # ===================================
-$env:SERVER_PORT = "8080"
+$env:SERVER_PORT = "8083"
 $env:DDL_AUTO = "update"
 
 # ===================================

@@ -9,16 +9,16 @@ $env:DB_DRIVER_CLASS = "com.mysql.cj.jdbc.Driver"
 # ===================================
 #   CONFIGURACION DE SEGURIDAD JWT
 # ===================================
-$env:JWT_SECRET = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2"
-$env:JWT_EXPIRATION = "3600000"
+# $env:JWT_SECRET = "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6a7b8c9d0e1f2"
+# $env:JWT_EXPIRATION = "3600000"
 
 # API Key para administración
-$env:ADMIN_API_KEY = "96rFZ8ff2a4oYzMna3uiL2"
+# $env:ADMIN_API_KEY = "96rFZ8ff2a4oYzMna3uiL2"
 
 # ===================================
 #       CONFIGURACION DE SERVIDOR
 # ===================================
-$env:SERVER_PORT = "8083"
+$env:SERVER_PORT = "8080"
 $env:DDL_AUTO = "update"
 
 # ===================================

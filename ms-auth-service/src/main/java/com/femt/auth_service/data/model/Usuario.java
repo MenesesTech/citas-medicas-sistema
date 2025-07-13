@@ -3,7 +3,6 @@ package com.femt.auth_service.data.model;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,9 +36,6 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(updatable = false, nullable = false, columnDefinition = "BINARY(16)")
-    private UUID usuarioUUID;
-
     @Column(nullable = false, unique = true)
     private String email;
 
@@ -50,8 +46,15 @@ public class Usuario implements UserDetails {
     @Column(nullable = false)
     private Rol rol;
 
-    @Builder.Default
-    private boolean isEnabled = false;
+    @Column(nullable = false)
+    private Long entidadId;
+
+    public Usuario(String email, String password, Rol rol, Long entidadId) {
+        this.email = email;
+        this.password = password;
+        this.rol = rol;
+        this.entidadId = entidadId;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -92,6 +95,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.isEnabled;
+        return true;
     }
+
 }

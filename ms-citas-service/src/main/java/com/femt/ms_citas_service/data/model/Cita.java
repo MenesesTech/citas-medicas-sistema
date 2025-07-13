@@ -2,34 +2,30 @@ package com.femt.ms_citas_service.data.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "citas")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Cita {
     @Id
-    @GeneratedValue
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Column(nullable = false)
     private LocalDate fecha;
-
-    @Column(nullable = false)
     private LocalTime hora;
+    private Long idMedico;
+    private Long idPaciente;
 
-    @ManyToOne
-    @JoinColumn(name = "medico_id", nullable = false)
-    private Medico medico;
-
-    @ManyToOne
-    @JoinColumn(name = "paciente_id", nullable = false)
-    private Paciente paciente;
+    @OneToOne(mappedBy = "cita", cascade = CascadeType.ALL)
+    private Receta receta;
 }

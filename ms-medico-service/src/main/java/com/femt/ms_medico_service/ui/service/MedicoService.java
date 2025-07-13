@@ -1,47 +1,75 @@
 package com.femt.ms_medico_service.ui.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.femt.ms_medico_service.data.dto.ListarMedicoDTO;
+import com.femt.ms_medico_service.data.dto.ModificarMedicoDTO;
+import com.femt.ms_medico_service.data.dto.RegistroMedicoDTO;
+import com.femt.ms_medico_service.data.dto.RegistroResponseDTO;
 import com.femt.ms_medico_service.data.model.Medico;
 import com.femt.ms_medico_service.data.repository.MedicoRepository;
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class MedicoService {
-    private final MedicoRepository medicoRepository;
-    private final RestTemplate restTemplate;
+    @Autowired
+    private MedicoRepository medicoRepository;
 
-    @Value("${ms-citas-service.url:http://ms-citas-service/api/citas/sync}")
-    private String citaServiceUrl;
-
-    public List<Medico> obtenerTodosMedicos() {
-        return medicoRepository.findAll();
-    }
-
-    public Medico obtenerMedicoPorId(UUID id) {
-        return medicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Médico no encontrado"));
-    }
-
-    public Medico crearMedico(Medico medico) {
-        Medico savedMedico = medicoRepository.save(medico);
-        // Sincronizar con ms-citas-service
-        syncMedicoWithCitasService(savedMedico);
-        return savedMedico;
-    }
-
-    private void syncMedicoWithCitasService(Medico medico) {
+    public RegistroResponseDTO guardar(RegistroMedicoDTO registroMedicoDTO) {
+        Medico medico = new Medico();
+        medico.setNombreCompleto(registroMedicoDTO.nombreCompleto());
+        medico.setEspecialidad(registroMedicoDTO.especialidad());
+        medico.setCentroMedico(registroMedicoDTO.centroMedico());
         try {
-            restTemplate.postForEntity(citaServiceUrl + "/medico", medico, Medico.class);
+            medicoRepository.save(medico);
+            return new RegistroResponseDTO(medico.getId());
         } catch (Exception e) {
-            // Loggear el error, pero no fallar la creación del médico
-            System.err.println("Error al sincronizar médico con ms-citas-service: " + e.getMessage());
+            throw new RuntimeException("Error al guardar el médico en la base de datos");
         }
+    }
+
+    public List<ListarMedicoDTO> listarTodos() {
+        return medicoRepository.findAll().stream()
+                .map(medico -> new ListarMedicoDTO(
+                        medico.getId(),
+                        medico.getNombreCompleto(),
+                        medico.getEspecialidad(),
+                        medico.getCentroMedico()))
+                .toList();
+    }
+
+    public Optional<ListarMedicoDTO> obtenerPorId(Long id) {
+        return medicoRepository.findById(id)
+                .map(medico -> new ListarMedicoDTO(
+                        medico.getId(),
+                        medico.getNombreCompleto(),
+                        medico.getEspecialidad(),
+                        medico.getCentroMedico()));
+    }
+
+    public Optional<ListarMedicoDTO> modificar(ModificarMedicoDTO modificarMedicoDTO) {
+        return medicoRepository.findById(modificarMedicoDTO.id())
+                .map(medico -> {
+                    medico.setNombreCompleto(modificarMedicoDTO.nombreCompleto());
+                    medico.setEspecialidad(modificarMedicoDTO.especialidad());
+                    medico.setCentroMedico(modificarMedicoDTO.centroMedico());
+                    Medico medicoGuardado = medicoRepository.save(medico);
+                    return new ListarMedicoDTO(
+                            medicoGuardado.getId(),
+                            medicoGuardado.getNombreCompleto(),
+                            medicoGuardado.getEspecialidad(),
+                            medicoGuardado.getCentroMedico());
+                });
+    }
+
+    public boolean eliminar(Long id) {
+        if (medicoRepository.existsById(id)) {
+            medicoRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
 }

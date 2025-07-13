@@ -1,16 +1,15 @@
 package com.femt.auth_service.security;
 
 import java.io.IOException;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.femt.auth_service.data.model.Usuario;
 import com.femt.auth_service.data.repository.UsuarioRepository;
 
 import jakarta.servlet.FilterChain;
@@ -30,32 +29,24 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Recuperar el token del encabezado Authorization
         var token = recoverToken(request);
 
         if (token != null) {
-            // Validar y extraer el UUID del subject del token
-            var subject = tokenService.validateToken(token);
+            // Validar token y establecer autenticación...
+            String subject = tokenService.validateToken(token);
 
             if (!subject.isEmpty()) {
-                UUID uuid = UUID.fromString(subject);
+                Long userId = Long.parseLong(subject);
+                Usuario usuario = usuarioRepository.findById(userId).orElse(null);
 
-                // Buscar el usuario autenticado
-                UserDetails usuario = usuarioRepository.findByUsuarioUUID(uuid)
-                        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-
-                // Crear token de autenticación
-                var authentication = new UsernamePasswordAuthenticationToken(
-                        usuario,
-                        null,
-                        usuario.getAuthorities());
-
-                // Establecer el usuario autenticado en el contexto de seguridad
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (usuario != null) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            usuario, null, usuario.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
-
-        // Continuar con la cadena de filtros
         filterChain.doFilter(request, response);
     }
 

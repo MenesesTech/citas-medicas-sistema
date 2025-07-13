@@ -25,7 +25,7 @@ public class TokenService {
             Algorithm algorithm = Algorithm.HMAC256(this.secret);
             return JWT.create()
                     .withIssuer(ISSUER)
-                    .withSubject(String.valueOf(usuario.getUsuarioUUID()))
+                    .withSubject(String.valueOf(usuario.getId()))
                     .withClaim("role", usuario.getRol().name())
                     .withExpiresAt(this.generateExpirationDate())
                     .sign(algorithm);
@@ -34,17 +34,6 @@ public class TokenService {
         }
     }
 
-    /**
-     * Valida un token JWT recibido en las solicitudes.
-     * 
-     * - Verifica la firma del token usando la misma clave secreta.
-     * - Confirma que el token fue emitido por el servicio correcto.
-     * - Devuelve el `subject` (id del usuario) si el token es válido.
-     * - Si el token es inválido, devuelve una cadena vacía.
-     *
-     * @param token Token JWT a validar.
-     * @return Email del usuario si es válido, o cadena vacía si es inválido.
-     */
     public String validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(this.secret);
@@ -58,14 +47,6 @@ public class TokenService {
         }
     }
 
-    /**
-     * Genera la fecha de expiración para el token.
-     * 
-     * - Añade 2 horas a la hora local del sistema.
-     * - Usa zona horaria UTC-5 (Perú).
-     *
-     * @return Instante de expiración como objeto Instant.
-     */
     public Instant generateExpirationDate() {
         return LocalDateTime.now().plusHours(2).toInstant(ZoneOffset.of("-05:00"));
     }

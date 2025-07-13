@@ -11,10 +11,20 @@ public class GatewayConfig {
         @Bean
         public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
                 return builder.routes()
-                                .route("ms-auth-service", r -> r.path("/api/auth/**")
+                                .route("auth-service", r -> r.path("/api/auth/**")
                                                 .uri("lb://ms-auth-service"))
-                                .route("ms-patient-service", r -> r.path("/api/patients/**")
+                                .route("usuarios", r -> r.path("/api/usuarios/**")
+                                                .filters(f -> f.stripPrefix(0))
+                                                .uri("lb://ms-auth-service"))
+                                .route("pacientes", r -> r.path("/api/pacientes/**")
+                                                .filters(f -> f.stripPrefix(0))
                                                 .uri("lb://ms-patient-service"))
+                                .route("medicos", r -> r.path("/api/medicos/**")
+                                                .filters(f -> f.stripPrefix(0))
+                                                .uri("lb://ms-medico-service"))
+                                .route("citas", r -> r.path("/api/citas/**")
+                                                .filters(f -> f.stripPrefix(0))
+                                                .uri("lb://ms-citas-service"))
                                 .build();
         }
 }

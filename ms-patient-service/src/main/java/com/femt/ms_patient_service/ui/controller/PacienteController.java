@@ -1,6 +1,7 @@
 package com.femt.ms_patient_service.ui.controller;
 
-import java.util.UUID;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,13 +12,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.femt.ms_patient_service.data.dto.request.RegistroPacienteDTO;
 import com.femt.ms_patient_service.data.dto.request.UpdatePacienteDTO;
 import com.femt.ms_patient_service.data.dto.response.PacienteResponseDTO;
+import com.femt.ms_patient_service.data.model.Paciente;
 import com.femt.ms_patient_service.ui.service.PacienteService;
 
 import jakarta.validation.Valid;
@@ -31,46 +32,46 @@ public class PacienteController {
 
     @PostMapping(value = "/registrar", consumes = { "application/json" })
     public ResponseEntity<PacienteResponseDTO> registrarPaciente(
-            @RequestHeader("Authorization") String authorizationHeader,
             @Valid @RequestBody RegistroPacienteDTO registroPacienteDTO) {
-
-        String token = authorizationHeader.replace("Bearer ", "");
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(pacienteService.registrar(token, registroPacienteDTO));
+        try {
+            PacienteResponseDTO response = pacienteService.guardarPaciente(registroPacienteDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
     }
 
     @GetMapping
-    public ResponseEntity<PacienteResponseDTO> obtenerPaciente(
-            @RequestHeader("Authorization") String authorizationHeader) {
-
-        String token = authorizationHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(pacienteService.obtener(token));
+    public ResponseEntity<List<Paciente>> listarTodos() {
+        List<Paciente> pacientes = pacienteService.listarTodos();
+        return ResponseEntity.ok(pacientes);
     }
 
-    @PutMapping(value = "/modificar", consumes = { "application/json" })
-    public ResponseEntity<PacienteResponseDTO> modificarPaciente(
-            @RequestHeader("Authorization") String authorizationHeader,
-            @Valid @RequestBody UpdatePacienteDTO updatePacienteDTO) {
-
-        String token = authorizationHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(pacienteService.modificar(token, updatePacienteDTO));
+    @GetMapping("/{id}")
+    public ResponseEntity<Paciente> buscarPorId(@PathVariable Long id) {
+        Optional<Paciente> paciente = pacienteService.buscarPorId(id);
+        return paciente.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/admin/listar")
-    public ResponseEntity<java.util.List<PacienteResponseDTO>> listarPacientes(
-            @RequestHeader("Authorization") String authorizationHeader) {
-
-        String token = authorizationHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(pacienteService.listarTodos(token));
+    @PutMapping(value = "/{id}", consumes = { "application/json" })
+    public ResponseEntity<Paciente> modificarPaciente(@PathVariable Long id,
+            @Valid @RequestBody UpdatePacienteDTO updateDTO) {
+        try {
+            Paciente pacienteModificado = pacienteService.modificarPaciente(id, updateDTO);
+            return ResponseEntity.ok(pacienteModificado);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping("/{usuarioUUID}")
-    public ResponseEntity<Void> eliminarPaciente(
-            @RequestHeader("Authorization") String authorizationHeader,
-            @PathVariable UUID usuarioUUID) {
-
-        String token = authorizationHeader.replace("Bearer ", "");
-        pacienteService.eliminar(token, usuarioUUID);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarPaciente(@PathVariable Long id) {
+        try {
+            pacienteService.eliminarPaciente(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
